@@ -91,7 +91,7 @@ def train_FCNResNet():
         if os.path.isfile(args.resume):
             print("Load checkpoint '{}'".format(args.resume))
             checkpoint = torch.load(args.resume)
-            args.start_epoch = checkpoint['epoch']
+            args.start_epoch = checkpoint['epoch'] + 1
             fcn_resnet.load_state_dict(checkpoint['model'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("Loaded checkpoint '{}' (epoch {})"
@@ -132,10 +132,12 @@ def train_FCNResNet():
             optimizer.step()
 
             losses.update(loss.item())
-            batch_time.update(time.time() - batch_endtime)
-            batch_endtime = time.time()
 
             if i % 100 == 0:
+
+                batch_time.update(time.time() - batch_endtime)
+                batch_endtime = time.time()
+
                 print('Epoch: [{0}/{1} | {2}/{3}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.sum:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
@@ -152,7 +154,7 @@ def train_FCNResNet():
                 'optimizer': optimizer.state_dict(),
                 'loss': losses.avg,
             },
-            f=os.path.join(saved_models_path(), 'checkpoint.pth.tar')
+            f=os.path.join(saved_models_path(), 'checkpoint_{0}.pth.tar'.format(epoch))
         )
 
         print('Epoch: [{0}/{1}]\t'

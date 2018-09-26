@@ -65,6 +65,8 @@ def cvt_ADE20K_to_collection(dataset_folder, dst_folder, dst_label_color):
             ori_img_path = os.path.join(root, basename + '.jpg')
             dst_img_path = os.path.join(dst_imgs_folder, basename + '.png')
             img = cv2.imread(ori_img_path)
+            if img.shape[1] > 1500:
+                img = cv2.resize(img, None, fx=0.5, fy=0.5)
             cv2.imwrite(dst_img_path, img)
 
             ori_label_path = os.path.join(root, basename + '_seg.png')
@@ -88,17 +90,15 @@ def cvt_ADE20K_to_collection(dataset_folder, dst_folder, dst_label_color):
                 mask = cvt_object_label(label, ori_label_color, dst_label_color)
                 mask_all = cv2.bitwise_or(mask_all, mask)
 
+            if mask_all.shape[1] > 1500:
+                mask_all = cv2.resize(mask_all, None, fx=0.5, fy=0.5)
             cv2.imwrite(dst_label_path, mask_all)
-
-
-            
-
-        
+               
 
 if __name__ == '__main__':
 
     dataset_folder = '/Ship01/Dataset/ADE20K'
-    dst_folder = os.path.join(get_path.dataset(), 'ADE20K')
-    dst_label_color = (200, 0, 0)
+    dst_folder = os.path.join(get_path.dataset_path(), 'ADE20K')
+    dst_label_color = (255, 255, 255)
 
     cvt_ADE20K_to_collection(dataset_folder, dst_folder, dst_label_color)

@@ -55,6 +55,9 @@ def cvt_labelme_prev(video_folder, dst_folder, ori_label_color, dst_label_color)
         dst_img_path = os.path.join(dst_imgs_folder, str(i) + '.png')
 
         ori_img = cv2.imread(ori_img_path)
+        scale = 1080 / ori_img.shape[1]
+        if (scale < 1):
+            ori_img = cv2.resize(ori_img, None, fx=scale, fy=scale)
         cv2.imwrite(dst_img_path, ori_img)
 
         # Write label
@@ -63,14 +66,16 @@ def cvt_labelme_prev(video_folder, dst_folder, ori_label_color, dst_label_color)
 
         ori_label = cv2.imread(ori_label_path)
         dst_label = cvt_object_label(ori_label, ori_label_color, dst_label_color)
+        if (scale < 1):
+            dst_label = cv2.resize(dst_label, None, fx=scale, fy=scale)
         cv2.imwrite(dst_label_path, dst_label)
 
 
 if __name__ == '__main__':
 
-    video_folder = '/Ship01/Dataset/flood/ControlledExperiments/Stream Rain Event 6.12 Labeled Images'
-    dst_folder = os.path.join(get_path.dataset(), 'Stream2')
-    ori_label_color = (0, 255, 255)
-    dst_label_color = (200, 0, 0)
+    video_folder = '/Ship01/Dataset/flood/FloodMeasurement/Creek_training_data'
+    dst_folder = os.path.join(get_path.dataset_path(), 'creek0')
+    ori_label_color = (255, 0, 188)
+    dst_label_color = (255, 255, 255)
 
     cvt_labelme_prev(video_folder, dst_folder, ori_label_color, dst_label_color)

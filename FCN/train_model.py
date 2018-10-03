@@ -26,16 +26,16 @@ def train_FCNResNet():
     parser = argparse.ArgumentParser(description='PyTorch FCNResNet Training')
     parser.add_argument(
         '--start-epoch', default=0, type=int, metavar='N',
-        help='manual epoch number (useful on restarts, default 0)')
+        help='Manual epoch number (useful on restarts, default 0).')
     parser.add_argument(
         '--total-epochs', default=100, type=int, metavar='N',
-        help='number of total epochs to run (default 100)')
+        help='Number of total epochs to run (default 100).')
     parser.add_argument(
         '--lr', '--learning-rate', default=0.05, type=float,
-        metavar='LR', help='initial learning rate')
+        metavar='LR', help='Initial learning rate.')
     parser.add_argument(
         '--resume', default=None, type=str, metavar='PATH',
-        help='path to latest checkpoint (default: none)')
+        help='Path to latest checkpoint (default: none).')
     args = parser.parse_args()
 
     print('Args:', args)
@@ -57,6 +57,7 @@ def train_FCNResNet():
         std=[0.229, 0.224, 0.225]
     )
     dataset = Dataset(
+        mode='train',
         dataset_path=dataset_path(), 
         input_transforms=transforms.Compose([
             transforms.ToTensor(),
@@ -89,15 +90,15 @@ def train_FCNResNet():
     # Load pretrained model
     if args.resume:
         if os.path.isfile(args.resume):
-            print("Load checkpoint '{}'".format(args.resume))
+            print('Load checkpoint \'{}\''.format(args.resume))
             checkpoint = torch.load(args.resume)
             args.start_epoch = checkpoint['epoch'] + 1
             fcn_resnet.load_state_dict(checkpoint['model'])
             optimizer.load_state_dict(checkpoint['optimizer'])
-            print("Loaded checkpoint '{}' (epoch {})"
+            print('Loaded checkpoint \'{}\' (epoch {})'
                   .format(args.resume, checkpoint['epoch']))
         else:
-            print("No checkpoint found at '{}'".format(args.resume))
+            print('No checkpoint found at \'{}\''.format(args.resume))
     else:
         print('Load pretrained ResNet 34.')
         # resnet32_url = 'https://download.pytorch.org/models/resnet34-333f7ec4.pth'

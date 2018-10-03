@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import os
+from scipy import signal
 
 sys.path.append('../')
 import utils
@@ -46,6 +47,14 @@ def estimate_waterlevel(result_folder,
                 waterlevel_df.loc[result_idx] = [pier_height]
                 break
 
+    # Laplace detect, median filter
+    waterlevel_df['pier_height_smoothed'] = signal.find_peaks_cwt(waterlevel_df['pier_height'], np.array(5,10))
+    print(waterlevel_df)
+
+    return       
+
+
+
     waterlevel_df['merged_ratio'] = 1 - waterlevel_df['pier_height'] / ref_obj['ori_height']
     waterlevel_df.to_csv(output_file)
 
@@ -55,12 +64,12 @@ if __name__ == '__main__':
 
     root_folder = '/Ship01/Dataset/flood/canyu_result/Houston/'
     result_folder = os.path.join(root_folder, 'water_smoothed_results')
-    output_file = os.path.join(root_folder, 'waterlevel_smoothed1.csv')
+    output_file = os.path.join(root_folder, 'waterlevel_smoothed2.csv')
     ref_obj = {
         'anchor_pt': [500, 145],
         'ori_height': 166
     }
     label_color = [255, 255, 255]
-    stride = 1
+    stride = 10
 
     estimate_waterlevel(result_folder, output_file, ref_obj, label_color, stride)

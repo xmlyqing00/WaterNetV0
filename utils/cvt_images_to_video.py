@@ -31,11 +31,11 @@ def cvt_images_to_video(image_folder,
 
 if __name__ == '__main__':
     
-    root_folder = '/Ship01/Dataset/flood/canyu_result/Houston/'
-    image_folder = os.path.join(root_folder, 'water_smoothed_results/')
-    video_path = os.path.join(root_folder, 'water_smoothed_result.avi')
-    fps = 30
+    root_folder = '/Ship01/Dataset/flood/collection/stream_test'
+    image_folder = os.path.join(root_folder, 'imgs/')
+    video_path = os.path.join(root_folder, 'stream_test_imgs.avi')
+    fps = 8
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    stride = 10
+    stride = 1
 
     cvt_images_to_video(image_folder, video_path, fps, fourcc, stride)

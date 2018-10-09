@@ -6,11 +6,11 @@ Yongqing Liang
 
 ## 1. Original Result
 
-![ori_result](D:\Sources\WaterLevelEstimation\FCN\canyu_results\ori_result.png)
+![ori_result](ori_result.png)
 
 ## 2. Time Series Smooth
 
-![time_series_smoothed](D:\Sources\WaterLevelEstimation\FCN\canyu_results\time_series_smoothed.png)
+![time_series_smoothed](time_series_smoothed.png)
 
 $Mask\_New_i = (1-decay) * Mask\_New_{i-1} + decay * Mask_i$
 
@@ -20,7 +20,7 @@ where $decay = 0.2, thres=200$
 
 ## 3. Laplacian Detect Peak
 
-![laplacian_detect](D:\Sources\WaterLevelEstimation\FCN\canyu_results\laplacian_detect.png)
+![laplacian_detect](laplacian_detect.png)
 
 $kernel\_size=5$
 
@@ -30,7 +30,7 @@ Apply on the time series smoothed result.
 
 ## 4. Median Filter
 
-![median_smoothed](D:\Sources\WaterLevelEstimation\FCN\canyu_results\median_smoothed.png)
+![median_smoothed](median_smoothed.png)
 
 $kernel\_size = 9$
 

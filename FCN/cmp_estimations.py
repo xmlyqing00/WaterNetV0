@@ -12,20 +12,19 @@ def cmp_estimations(csv0_path, csv1_path):
     est0_df['merged_ratio'].plot()
     plt.ylim(-0.3, 1.1)
     plt.figure()
-    (1 - est1_df['pier_height'] / 166).plot()
-    plt.ylim(-0.3, 1.1)
-    plt.figure()
     est1_df['merged_ratio'].plot()
     plt.ylim(-0.3, 1.1)
+    plt.figure()
+    est1_df['merged_ratio_smoothed'].plot()
+    plt.ylim(-0.3, 1.1)
     
-
     plt.show()
 
 
 if __name__ == '__main__':
 
     root_folder = '/Ship01/Dataset/flood/canyu_result/Houston'
-    csv0_path = os.path.join(root_folder, 'waterlevel_original.csv')
-    csv1_path = os.path.join(root_folder, 'waterlevel_smoothed2.csv')
+    csv0_path = os.path.join(root_folder, 'waterlevel_pier_original.csv')
+    csv1_path = os.path.join(root_folder, 'waterlevel_smoothed3.csv')
 
     cmp_estimations(csv0_path, csv1_path)

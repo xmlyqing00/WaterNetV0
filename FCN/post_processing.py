@@ -30,7 +30,7 @@ def TimeSeriesSmooth(result_folder,
 
         print("Working on", result_path)
 
-        water_mask = cvt_object_label(result_img, label_color)
+        water_mask = cvt_object_label(result_img, label_color, [255, 255, 255])
         if history_mask is None:
             history_mask = water_mask
         else:
@@ -45,10 +45,10 @@ def TimeSeriesSmooth(result_folder,
 
 if __name__ == '__main__':
 
-    root_folder = '/Ship01/Dataset/flood/collection/stream_test'
-    result_folder = os.path.join(root_folder, 'segs')
-    output_folder = os.path.join(root_folder, 'segs_smoothed')
-    label_color = [255, 255, 255]
+    root_folder = '/Ship01/Dataset/flood/canyu_result/Houston'
+    result_folder = os.path.join(root_folder, 'original_results')
+    output_folder = os.path.join(root_folder, 'seg_pier_smoothed')
+    label_color = [0, 200, 200]
     stride = 1
 
     TimeSeriesSmooth(result_folder, output_folder, label_color, stride)

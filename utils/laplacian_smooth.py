@@ -38,19 +38,25 @@ def laplacian_smooth(csv_path, key, output_file):
             if (cnt == 1):
                 df.loc[idx, 'laplacian_val'] = laplacian_val
 
-            if abs(laplacian_val) > 0.3:
-                for i in range(-4, 5):
+            if abs(laplacian_val) > 0.15:
+                for i in range(-2, 3):
                     median_filter(df, key, max(min(idx + i, n-1), 0) )
 
                 smooth_flag = True
+
+    plt.figure()
+    df[key].plot
+    
+    plt.figure()
+    df['laplacian_val'][half_width:-half_width-1].plot()
+
+    plt.figure()
+    df[key + '_smoothed'].plot()
 
     df = df.drop(columns=['tmp'])
     df.to_csv(output_file, index=False)
 
     print('Estimate waterlevel done.', output_file)
-    
-    plt.figure()
-    df[key].plot()
 
     plt.figure()
     df['laplacian_val'][half_width:-half_width-1].plot()

@@ -41,7 +41,7 @@ def estimate_waterlevel(result_folder,
         height, width, channels = result_img.shape
         if not constraint_flag:
             pier_height = 0
-            
+
         for y in range(420, ref_obj['anchor_pt'][1], -1):
 
             pier_count = 0
@@ -56,6 +56,7 @@ def estimate_waterlevel(result_folder,
                 pier_height = y - ref_obj['anchor_pt'][1]
                 break
         
+        print(pier_height)
         waterlevel_df.loc[result_idx, 'pier_height'] = pier_height
 
     waterlevel_df['merged_ratio'] = 1 - waterlevel_df['pier_height'] / ref_obj['ori_height']
@@ -68,15 +69,15 @@ def estimate_waterlevel(result_folder,
 if __name__ == '__main__':
 
     root_folder = '/Ship01/Dataset/flood/canyu_result/Houston/'
-    result_folder = os.path.join(root_folder, 'original_results')
-    output_file = os.path.join(root_folder, 'waterlevel_pier_original.csv')
+    result_folder = os.path.join(root_folder, 'seg_pier_smoothed')
+    output_file = os.path.join(root_folder, 'waterlevel_pier_smoothed0.csv')
     ref_obj = {
         'anchor_pt': [506, 144],
         'ori_height': 166
     }
-    # label_color = [255, 255, 255]
-    label_color = [0, 200, 200]
+    label_color = [255, 255, 255]
+    # label_color = [0, 200, 200]
     stride = 1
-    constraint_flag = False
+    constraint_flag = True
 
     estimate_waterlevel(result_folder, output_file, ref_obj, label_color, stride, constraint_flag)

@@ -9,8 +9,8 @@ def trial_gradient(img):
     
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     laplacian = abs(cv2.Laplacian(gray_img, cv2.CV_32F))
-    sobelx = abs(cv2.Sobel(gray_img, cv2.CV_32F, 1, 0, ksize=5))
-    sobely = abs(cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=5))
+    sobelx = abs(cv2.Sobel(gray_img, cv2.CV_32F, 1, 0, ksize=3))
+    sobely = abs(cv2.Sobel(gray_img, cv2.CV_32F, 0, 1, ksize=3))
 
     cv2.imshow("img", img) 
     cv2.imshow("gray", gray_img)

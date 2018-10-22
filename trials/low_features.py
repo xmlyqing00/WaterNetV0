@@ -12,24 +12,41 @@ def trial_gradient(img):
 
     f = np.fft.fft2(gray_img)
     fshift = np.fft.fftshift(f)
-    magnitude_spectrum = 20*np.log(np.abs(fshift))
+    
+    angle_map = np.angle(fshift)
+    angle_map /= angle_map.max()
 
     rows, cols = gray_img.shape
     crow,ccol = (int)(rows/2) , (int)(cols/2)
     w = 50
-    fshift[crow-w:crow+w, ccol-w:ccol+w] = 0
-    f_ishift = np.fft.ifftshift(fshift)
-    img_back = np.fft.ifft2(f_ishift)
-    img_back = np.abs(img_back)
+    print(fshift.dtype)
+    for i in range(1, 100):
+        f = np.zeros((rows, cols), 'complex128')
+        # f = fshift
+        if crow-w*i < 0 or crow+w*i  >= rows or ccol-w*i < 0 or ccol+w*i >= cols:
+            break
+        f[crow-w*i:crow+w*i, ccol-w*i:ccol+w*i] = fshift[crow-w*i:crow+w*i, ccol-w*i:ccol+w*i]
+        f[crow-w*(i-1):crow+w*(i-1), ccol-w*(i-1):ccol+w*(i-1)] = 0
 
-    plt.subplot(131),plt.imshow(img, cmap = 'gray')
-    plt.title('Input Image'), plt.xticks([]), plt.yticks([])
-    plt.subplot(132),plt.imshow(img_back, cmap = 'gray')
-    plt.title('Image after HPF'), plt.xticks([]), plt.yticks([])
-    plt.subplot(133),plt.imshow(img_back)
-    plt.title('Result in JET'), plt.xticks([]), plt.yticks([])
+        f_ishift = np.fft.ifftshift(f)
+        magnitude_spectrum = 20*np.log(np.abs(f))
+        magnitude_spectrum /= magnitude_spectrum.max()
+        img_back = np.fft.ifft2(f_ishift)
+        img_back = np.abs(img_back)
+        img_back /= img_back.max()
 
-    plt.show()
+        cv2.imshow("magnitude", magnitude_spectrum)
+        cv2.imshow("back", img_back)
+        cv2.waitKey()
+
+    # plt.subplot(131),plt.imshow(img, cmap = 'gray')
+    # plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+    # plt.subplot(132),plt.imshow(img_back, cmap = 'gray')
+    # plt.title('Image after HPF'), plt.xticks([]), plt.yticks([])
+    # plt.subplot(133),plt.imshow(img_back)
+    # plt.title('Result in JET'), plt.xticks([]), plt.yticks([])
+
+    # plt.show()
 
     # plt.subplot(121),plt.imshow(gray_img, cmap = 'gray')
     # plt.title('Input Image'), plt.xticks([]), plt.yticks([])

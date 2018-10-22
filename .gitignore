@@ -2,3 +2,5 @@ __pycache__/
 /.vscode/
 /.idea/
 saved_models/
+
+.DS_Store

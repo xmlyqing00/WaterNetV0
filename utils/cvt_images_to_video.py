@@ -31,11 +31,13 @@ def cvt_images_to_video(image_folder,
 
 if __name__ == '__main__':
     
-    root_folder = '/Ship01/Dataset/flood/collection/stream_test'
-    image_folder = os.path.join(root_folder, 'imgs/')
-    video_path = os.path.join(root_folder, 'stream_test_imgs.avi')
-    fps = 8
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    root_folder = '/Ship01/Dataset/water/collection/'
+    test_name = 'boston_harbor0'
+    method = 'RGMP'
+    image_folder = os.path.join(root_folder, 'overlays/', method, test_name)
+    video_path = os.path.join(root_folder, 'videos/', method, test_name + '.mp4')
+    fps = 10
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     stride = 1
 
     cvt_images_to_video(image_folder, video_path, fps, fourcc, stride)

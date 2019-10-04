@@ -6,15 +6,18 @@ from cvt_object_label import cvt_object_label
 
 def add_mask_to_image(image, mask, label_color):
     
+    # cv2.imshow("input_mask", mask)
+
     roi = cvt_object_label(mask, label_color, [255, 255, 255])
-    mask = cvt_object_label(mask, label_color, [0, 255, 255])
+    mask = cvt_object_label(mask, label_color, [255, 0, 255])
     
-    # cv2.imshow("roi", roi)
     complement = cv2.bitwise_not(roi)
     complement_img = cv2.bitwise_and(complement, image)
+    mask = mask + complement_img
+
+    # cv2.imshow("roi", roi)
     # cv2.imshow("com", complement_img)
     # cv2.imshow("img", image)
-    mask = mask + complement_img
     # cv2.imshow("mask", mask)
     # cv2.waitKey()
 
@@ -27,8 +30,9 @@ def add_mask_to_image(image, mask, label_color):
 def cvt_images_to_overlays(image_folder, 
                            mask_folder,
                            output_folder, 
-                           label_color=(255, 255, 255),
-                           stride=1):
+                           label_color=[255, 255, 255],
+                           stride=1,
+                           frame_st=0):
 
     image_list = os.listdir(image_folder)
     mask_list = os.listdir(mask_folder)
@@ -47,15 +51,14 @@ def cvt_images_to_overlays(image_folder,
     stride = max(0, int(stride))
     for image_idx in range(0, len(mask_list), stride):
         
-        image_path = os.path.join(image_folder, image_list[image_idx])
+        image_path = os.path.join(image_folder, image_list[image_idx+frame_st])
         image = cv2.imread(image_path)
+        image = cv2.resize(image, None, None, 0.5, 0.5)
 
         mask_path = os.path.join(mask_folder, mask_list[image_idx])
         mask = cv2.imread(mask_path)
 
-        mask = cvt_object_label(mask, [255, 255, 255], label_color)
-
-        image_mask = add_mask_to_image(image, mask, [255, 255, 255])
+        image_mask = add_mask_to_image(image, mask, label_color)
 
         filename, ext = os.path.splitext(image_list[image_idx])
         output_name = filename + '_mask.png'
@@ -65,14 +68,16 @@ def cvt_images_to_overlays(image_folder,
         print("Add mask to image", output_path)
 
 def run_cvt_images_to_overlays():
-    root_folder = '/Ship01/Dataset/flood/collection/stream_test'
-    image_folder = os.path.join(root_folder, 'imgs/')
-    mask_folder = os.path.join(root_folder, 'segs/')
-    output_folder = os.path.join(root_folder, 'overlays')
-    label_color = (200, 0, 0)
+    root_folder = '/Ship01/Dataset/water/collection/'
+    test_name = 'boston_harbor0'
+    image_folder = os.path.join(root_folder, 'imgs/', test_name)
+    mask_folder = os.path.join(root_folder, 'segs/RGMP/', test_name)
+    output_folder = os.path.join(root_folder, 'overlays/RGMP', test_name)
+    label_color = (0, 0, 128)
     stride = 1
+    frame_st = 70
 
-    cvt_images_to_overlays(image_folder, mask_folder,  output_folder, label_color, stride)
+    cvt_images_to_overlays(image_folder, mask_folder, output_folder, label_color, stride, frame_st)
 
 def run_add_mask_to_image():
 
@@ -82,8 +87,7 @@ def run_add_mask_to_image():
     image_mask = add_mask_to_image(image, mask, [200, 0, 0])
     cv2.imwrite(os.path.join(root_folder, '1798_before_smoothed_overlay.png'), image_mask)
 
-
 if __name__ == '__main__':
     
-    # run_cvt_images_to_overlays()
-    run_add_mask_to_image()
+    run_cvt_images_to_overlays()
+    # run_add_mask_to_image()

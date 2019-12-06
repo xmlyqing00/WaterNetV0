@@ -68,7 +68,13 @@ def estimate_waterlevel(result_folder,
 
 if __name__ == '__main__':
 
-    root_folder = '/Ship01/Dataset/flood/canyu_result/Houston/'
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--rootfolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    root_folder = args.rootfolder
+
+    # root_folder = '/Ship01/Dataset/flood/canyu_result/Houston/'
     result_folder = os.path.join(root_folder, 'seg_pier_smoothed')
     output_file = os.path.join(root_folder, 'waterlevel_pier_smoothed0.csv')
     ref_obj = {

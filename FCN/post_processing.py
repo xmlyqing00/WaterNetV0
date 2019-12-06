@@ -2,6 +2,7 @@ import sys
 import cv2
 import numpy as np
 import os
+import argparse
 
 sys.path.append('../')
 from utils.cvt_object_label import cvt_object_label
@@ -45,7 +46,13 @@ def TimeSeriesSmooth(result_folder,
 
 if __name__ == '__main__':
 
-    root_folder = '/Ship01/Dataset/flood/canyu_result/Houston'
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--rootfolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    root_folder = args.rootfolder
+
+    # root_folder = '/Ship01/Dataset/flood/canyu_result/Houston'
     result_folder = os.path.join(root_folder, 'original_results')
     output_folder = os.path.join(root_folder, 'seg_pier_smoothed')
     label_color = [0, 200, 200]

@@ -1,5 +1,6 @@
 import os
 import cv2
+import argparse
 
 def format_file_names(folder):
     
@@ -17,6 +18,13 @@ def format_file_names(folder):
 
 
 if __name__ == '__main__':
-    root = '/Ship01/Dataset/water/collection/imgs/'
-    folder = os.path.join(root, 'boston_harbor1')
+
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--rootfolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    root_folder = args.rootfolder
+
+    # root = '/Ship01/Dataset/water/collection/imgs/'
+    folder = os.path.join(root_folder, 'boston_harbor1')
     format_file_names(folder)

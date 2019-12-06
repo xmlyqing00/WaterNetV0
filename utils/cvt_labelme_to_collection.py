@@ -5,6 +5,7 @@
 import os
 import numpy as np
 import cv2
+import argparse
 
 import get_path
 from cvt_object_label import cvt_object_label
@@ -73,7 +74,13 @@ def cvt_labelme_prev(video_folder, dst_folder, ori_label_color, dst_label_color)
 
 if __name__ == '__main__':
 
-    video_folder = '/Ship01/Dataset/flood/FloodMeasurement/Creek_training_data'
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--videofolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    video_folder = args.videofolder
+
+    # video_folder = '/Ship01/Dataset/flood/FloodMeasurement/Creek_training_data'
     dst_folder = os.path.join(get_path.dataset_path(), 'creek0')
     ori_label_color = (255, 0, 188)
     dst_label_color = (255, 255, 255)

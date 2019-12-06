@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import os
+import argparse
 
 def cvt_images_to_video(image_folder,
                         video_path,
@@ -31,7 +32,13 @@ def cvt_images_to_video(image_folder,
 
 if __name__ == '__main__':
     
-    root_folder = '/Ship01/Dataset/water/collection/'
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--rootfolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    root_folder = args.rootfolder
+
+    # root_folder = '/Ship01/Dataset/water/collection/'
     test_name = 'boston_harbor0'
     method = 'RGMP'
     image_folder = os.path.join(root_folder, 'overlays/', method, test_name)

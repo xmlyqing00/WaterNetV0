@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import os
+import argparse
 
 from cvt_object_label import cvt_object_label
 
@@ -67,8 +68,8 @@ def cvt_images_to_overlays(image_folder,
 
         print("Add mask to image", output_path)
 
-def run_cvt_images_to_overlays():
-    root_folder = '/Ship01/Dataset/water/collection/'
+def run_cvt_images_to_overlays(root_folder):
+    # root_folder = '/Ship01/Dataset/water/collection/'
     test_name = 'boston_harbor0'
     image_folder = os.path.join(root_folder, 'imgs/', test_name)
     mask_folder = os.path.join(root_folder, 'segs/RGMP/', test_name)
@@ -79,9 +80,9 @@ def run_cvt_images_to_overlays():
 
     cvt_images_to_overlays(image_folder, mask_folder, output_folder, label_color, stride, frame_st)
 
-def run_add_mask_to_image():
+def run_add_mask_to_image(root_folder):
 
-    root_folder = '/Ship01/Documents/MyPapers/FloodHydrograph/imgs'
+    # root_folder = '/Ship01/Documents/MyPapers/FloodHydrograph/imgs'
     image = cv2.imread(os.path.join(root_folder, '1798_original.png'))
     mask = cv2.imread(os.path.join(root_folder, '1798_before_smoothed.png'))
     image_mask = add_mask_to_image(image, mask, [200, 0, 0])
@@ -89,5 +90,11 @@ def run_add_mask_to_image():
 
 if __name__ == '__main__':
     
-    run_cvt_images_to_overlays()
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--rootfolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    root_folder = args.rootfolder
+
+    run_cvt_images_to_overlays(root_folder)
     # run_add_mask_to_image()

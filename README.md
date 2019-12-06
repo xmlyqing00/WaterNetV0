@@ -20,10 +20,18 @@ Change the file paths in the `utils/get_path.py` accordingly.
 
 ### Evaluate the model
 
+To evaluate the model, open a Terminal and type
+```
+    python3 FCN/test_model.py
+```
 ### Retrain the model
+To retrain the model, open a Terminal and type
+```
+    python3 FCN/train_model.py
+```
+### Documentation
 
-
-## Scripts in FCN
+### Scripts in FCN
 This folder contains the scripts of network architecture, training and evaluation.
 
 - `cmp_estimations.py`: Compare and show the results of two water levels.
@@ -34,7 +42,7 @@ This folder contains the scripts of network architecture, training and evaluatio
 - `test_model.py`: Scripts for evaluation.
 - `train_model.py`: Scripts for training the model.
 
-## Scripts in Utils
+### Scripts in Utils
 
 This folder contains scripts for preparing dataset, preprocessing and postprocessing.
 

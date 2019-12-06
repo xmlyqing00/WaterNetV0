@@ -11,6 +11,18 @@ The required libraries and scripts could be simply installed by
 ```
 Details of the version of the required libraries could be found in the file `requirements.txt`
 
+## Dataset and Pretrained Model
+
+Click [here](..) to download the dataset and the pretrained model. Unzip them.
+Change the file paths in the `utils/get_path.py` accordingly.
+
+## Usage
+
+### Evaluate the model
+
+### Retrain the model
+
+
 ## Scripts in FCN
 This folder contains the scripts of network architecture, training and evaluation.
 

@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import argparse
 
 def drop_error_estimation(in_csv_path, out_csv_path):
     
@@ -30,7 +31,13 @@ def drop_error_estimation(in_csv_path, out_csv_path):
 
 if __name__ == '__main__':
 
-    root_folder = '/Ship01/Dataset/flood/canyu_result/Houston'
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--rootfolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    root_folder = args.rootfolder
+
+    # root_folder = '/Ship01/Dataset/flood/canyu_result/Houston'
     in_csv_path = os.path.join(root_folder, 'waterlevel_pier_smoothed0.csv')
     out_csv_path = os.path.join(root_folder, 'waterlevel_pier_smoothed1.csv')
 

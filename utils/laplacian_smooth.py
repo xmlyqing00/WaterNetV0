@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import argparse
 
 def median_filter(df, key, idx, kernel_size=25):
     half_kernel_size = int(kernel_size / 2)
@@ -69,7 +70,13 @@ def laplacian_smooth(csv_path, key, output_file):
 
 if __name__ == '__main__':
 
-    root_folder = '/Ship01/Dataset/flood/canyu_result/Houston/'
+    parser = argparse.ArgumentParser(description='LSU WaterLevel Estimation')
+    parser.add_argument(
+        '--rootfolder', default=None, type=str, metavar='PATH')
+    args = parser.parse_args()
+    root_folder = args.rootfolder
+
+    # root_folder = '/Ship01/Dataset/flood/canyu_result/Houston/'
     csv_file = os.path.join(root_folder, 'waterlevel_smoothed3.csv')
     output_file = csv_file
 

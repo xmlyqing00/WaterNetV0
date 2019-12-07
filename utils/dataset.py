@@ -23,21 +23,23 @@ class Dataset(data.Dataset):
         self.input_transforms = input_transforms
         
         if mode != 'test':
+            
+            imgs_folder = os.path.join(dataset_path, 'imgs/')
+            labels_folder = os.path.join(dataset_path, 'labels/')
 
-            for sub_folder in os.listdir(dataset_path):
+            for sub_folder in os.listdir(imgs_folder):
                 
-                sub_folder_path = os.path.join(dataset_path, sub_folder)
-
-                imgs_path = os.path.join(sub_folder_path, 'imgs/')
+                imgs_path = os.path.join(imgs_folder, sub_folder)
                 imgs_list = os.listdir(imgs_path)
                 imgs_list.sort(key = lambda x: (len(x), x))
                 self.input_list += [add_prefix(imgs_path, name) for name in imgs_list]
             
-                labels_path = os.path.join(sub_folder_path, 'labels/')
+            for sub_folder in os.listdir(labels_folder):
+                labels_path = os.path.join(labels_folder, sub_folder)
                 labels_list = os.listdir(labels_path)
                 labels_list.sort(key = lambda x: (len(x), x))
                 self.target_list += [add_prefix(labels_path, name) for name in labels_list]
-
+            
         else:
 
             imgs_list = os.listdir(dataset_path)

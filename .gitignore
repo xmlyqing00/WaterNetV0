@@ -2,5 +2,7 @@ __pycache__/
 /.vscode/
 /.idea/
 saved_models/
+FCN/output/
+models/
 
 .DS_Store

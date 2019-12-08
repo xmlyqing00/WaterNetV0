@@ -9,7 +9,6 @@ from torchvision import transforms
 sys.path.append('../')
 from model import FCNResNet
 from utils.dataset import Dataset
-from utils.get_path import dataset_path, saved_models_path
 from utils.AvgMeter import AverageMeter
 
 
@@ -36,6 +35,13 @@ def train_FCNResNet():
     parser.add_argument(
         '--resume', default=None, type=str, metavar='PATH',
         help='Path to latest checkpoint (default: none).')
+    parser.add_argument(
+        '--dataset', default='/Ship01/Dataset/water_v1', metavar='PATH',
+        help='Path to the training dataset')
+    parser.add_argument(
+        '--modelpath', default='./models/', metavar='PATH',
+        help='Path to the models.')
+
     args = parser.parse_args()
 
     print('Args:', args)
@@ -58,7 +64,7 @@ def train_FCNResNet():
     )
     dataset = Dataset(
         mode='train',
-        dataset_path=dataset_path(), 
+        dataset_path=args.dataset, 
         input_transforms=transforms.Compose([
             transforms.ToTensor(),
             imagenet_normalize
@@ -101,15 +107,15 @@ def train_FCNResNet():
             print('No checkpoint found at \'{}\''.format(args.resume))
     else:
         print('Load pretrained ResNet 34.')
-        # resnet32_url = 'https://download.pytorch.org/models/resnet34-333f7ec4.pth'
-        pretrained_model = torch.load(os.path.join(saved_models_path(), 'resnet34-333f7ec4.pth'))
+        resnet34_url = 'https://download.pytorch.org/models/resnet34-333f7ec4.pth'
+        pretrained_model = model_zoo.load_url(resnet34_url)
         fcn_resnet.load_pretrained_model(pretrained_model)
 
     # Start training
     fcn_resnet.train()
     epoch_endtime = time.time()
-    if not os.path.exists(saved_models_path()):
-        os.mkdir(saved_models_path())
+    if not os.path.exists(args.modelpath):
+        os.mkdir(args.modelpath)
 
     epoch_time = AverageMeter()
 
@@ -155,7 +161,7 @@ def train_FCNResNet():
                 'optimizer': optimizer.state_dict(),
                 'loss': losses.avg,
             },
-            f=os.path.join(saved_models_path(), 'checkpoint_{0}.pth.tar'.format(epoch))
+            f=os.path.join(args.modelpath, 'checkpoint_{0}.pth.tar'.format(epoch))
         )
 
         print('Epoch: [{0}/{1}]\t'

@@ -7,7 +7,6 @@ import numpy as np
 import cv2
 import argparse
 
-import get_path
 from cvt_object_label import cvt_object_label
 
 def get_img_list(imgs_folder):
@@ -81,7 +80,11 @@ if __name__ == '__main__':
     video_folder = args.videofolder
 
     # video_folder = '/Ship01/Dataset/flood/FloodMeasurement/Creek_training_data'
+<<<<<<< HEAD
     dst_folder = os.path.join(get_path.dataset_path(), 'creek0')
+=======
+    dst_folder = os.path.join(video_folder, 'creek0')
+>>>>>>> 2213840ecf8be1dafbd1ffe8fd1f9da26b59d7ae
     ori_label_color = (255, 0, 188)
     dst_label_color = (255, 255, 255)
 

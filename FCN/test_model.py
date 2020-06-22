@@ -16,14 +16,14 @@ from utils.AvgMeter import AverageMeter
 
 
 def test_FCNResNet():
-    
+
     # Hyper parameters
     parser = argparse.ArgumentParser(description='PyTorch FCNResNet Testing')
     parser.add_argument(
-        '-c', '--checkpoint', default='models/checkpoint_58.pth.tar', type=str, metavar='PATH',
+        '-c', '--checkpoint', default='../data/models/checkpoint_58.pth.tar', type=str, metavar='PATH',
         help='Path to latest checkpoint (default: none).')
     parser.add_argument(
-        '-i', '--imgs-path', default='/Ship01/Dataset/water_v1/test_videos/houston_small', type=str, metavar='PATH',
+        '-i', '--imgs-path', default='../data/houston_small', type=str, metavar='PATH',
         help='Path to the test imgs (default: none).')
     parser.add_argument(
         '-o', '--out-path', default='output/', type=str, metavar='PATH',

@@ -16,6 +16,10 @@ Details of the version of the required libraries could be found in the file `req
 The dataset is split into training data (`water_v1.zip`), and evaluation dataset (`test_videos.zip`). We also provide the pretrained model (`checkpoint_58.pth.tar`).
 Click [here](https://www.dropbox.com/sh/yk39hpqwnzauv02/AAA_IYacZf_bEbcURj-PQXIra?dl=0) to download the dataset and the pretrained model.
 
+You should put the pretrained model at the path `LSUWaterSegmentation/data/models/checkpoint_58.pth.tar`.
+
+You should put the contents of `test_videoes.zip` at `LSUWaterSegmentation/data/models/houston_small`.
+
 ## Usage
 
 ### Evaluate the model

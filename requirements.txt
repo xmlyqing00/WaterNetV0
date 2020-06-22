@@ -1,8 +1,7 @@
 torch
 torchvision
-opencv-python=3.4.3.18 
+opencv-python~=3.4
 matplotlib
-argparse
 numpy
 pandas
 Pillow>=5.3.0

@@ -1,7 +1,9 @@
-import os
+#!/usr/bin/env python3
 import argparse
+import os
 import sys
 import time
+
 import cv2
 import torch
 from torch.utils import model_zoo
@@ -57,7 +59,7 @@ def test_FCNResNet():
     )
     dataset = Dataset(
         mode='test',
-        dataset_path=args.imgs_path, 
+        dataset_path=args.imgs_path,
         input_transforms=transforms.Compose([
             transforms.ToTensor(),
             imagenet_normalize
@@ -85,14 +87,14 @@ def test_FCNResNet():
         raise ValueError('No checkpoint found at \'{}\''.format(args.checkpoint))
 
     # Start testing
-    
+
     fcn_resnet.eval()
 
     if not os.path.exists(args.out_path):
         os.mkdir(args.out_path)
 
     for i, input in enumerate(test_loader):
-        
+
         print(i)
 
         input = input.to(device)

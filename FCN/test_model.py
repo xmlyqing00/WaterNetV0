@@ -1,7 +1,9 @@
-import os
+#!/usr/bin/env python3
 import argparse
+import os
 import sys
 import time
+
 import cv2
 import torch
 from torch.utils import model_zoo
@@ -14,14 +16,14 @@ from utils.AvgMeter import AverageMeter
 
 
 def test_FCNResNet():
-    
+
     # Hyper parameters
     parser = argparse.ArgumentParser(description='PyTorch FCNResNet Testing')
     parser.add_argument(
-        '-c', '--checkpoint', default='models/checkpoint_58.pth.tar', type=str, metavar='PATH',
+        '-c', '--checkpoint', default='../data/models/checkpoint_58.pth.tar', type=str, metavar='PATH',
         help='Path to latest checkpoint (default: none).')
     parser.add_argument(
-        '-i', '--imgs-path', default='/Ship01/Dataset/water_v1/test_videos/houston_small', type=str, metavar='PATH',
+        '-i', '--imgs-path', default='../data/houston_small', type=str, metavar='PATH',
         help='Path to the test imgs (default: none).')
     parser.add_argument(
         '-o', '--out-path', default='output/', type=str, metavar='PATH',
@@ -57,7 +59,7 @@ def test_FCNResNet():
     )
     dataset = Dataset(
         mode='test',
-        dataset_path=args.imgs_path, 
+        dataset_path=args.imgs_path,
         input_transforms=transforms.Compose([
             transforms.ToTensor(),
             imagenet_normalize
@@ -85,14 +87,14 @@ def test_FCNResNet():
         raise ValueError('No checkpoint found at \'{}\''.format(args.checkpoint))
 
     # Start testing
-    
+
     fcn_resnet.eval()
 
     if not os.path.exists(args.out_path):
         os.mkdir(args.out_path)
 
     for i, input in enumerate(test_loader):
-        
+
         print(i)
 
         input = input.to(device)

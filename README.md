@@ -5,9 +5,9 @@ This is a package for water level estimation, named **LSUWaterLevelEstimation**.
 ## Environment
 All python scripts are written and tested under Ubuntu 18.04 and Python 3.6
 
-The required libraries and scripts could be simply installed by 
-```
-    pip install -r requirements.txt
+The required libraries and scripts could be simply installed by
+```bash
+pip install -r requirements.txt
 ```
 Details of the version of the required libraries could be found in the file `requirements.txt`
 
@@ -16,21 +16,26 @@ Details of the version of the required libraries could be found in the file `req
 The dataset is split into training data (`water_v1.zip`), and evaluation dataset (`test_videos.zip`). We also provide the pretrained model (`checkpoint_58.pth.tar`).
 Click [here](https://www.dropbox.com/sh/yk39hpqwnzauv02/AAA_IYacZf_bEbcURj-PQXIra?dl=0) to download the dataset and the pretrained model.
 
+You should put the pretrained model at the path `LSUWaterSegmentation/data/models/checkpoint_58.pth.tar`.
+
+You should put the contents of `test_videoes.zip` at `LSUWaterSegmentation/data/models/houston_small`.
+
 ## Usage
 
 ### Evaluate the model
 
 To evaluate the model, open a Terminal and type
-```
-    cd FCN
-    python3 test_model.py
+```bash
+cd FCN
+python3 test_model.py
 ```
 Type `--help` to ses the parameters that can be used.
+
 ### Retrain the model
 To retrain the model, open a Terminal and type
-```
-    cd FCN
-    python3 train_model.py
+```bash
+cd FCN
+python3 train_model.py
 ```
 Type `--help` to ses the parameters that can be used.
 

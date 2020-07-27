@@ -1,45 +1,37 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import sys
-import time
 
 import cv2
 import torch
-from torch.utils import model_zoo
+from tqdm import tqdm
 from torchvision import transforms
 
-sys.path.append('../')
-from model import FCNResNet
-from utils.dataset import Dataset
-from utils.AvgMeter import AverageMeter
+from FCN.model import WaterNetV0
+from FCN.dataset import Dataset
 
 
-def test_FCNResNet():
+def test_WaterNetV0():
 
     # Hyper parameters
-    parser = argparse.ArgumentParser(description='PyTorch FCNResNet Testing')
+    parser = argparse.ArgumentParser(description='WaterNetV0 Testing')
     parser.add_argument(
-        '-c', '--checkpoint', default='../data/models/checkpoint_58.pth.tar', type=str, metavar='PATH',
-        help='Path to latest checkpoint (default: none).')
+        '-c', '--checkpoint', default='cp/checkpoint_58.pth.tar', type=str, metavar='PATH',
+        help='Path to latest checkpoint (default: cp/checkpoint_58.pth.tar).')
     parser.add_argument(
-        '-i', '--imgs-path', default='../data/houston_small', type=str, metavar='PATH',
-        help='Path to the test imgs (default: none).')
+        '-i', '--imgs-path', default='/Ship01/Dataset/water_v1', type=str, metavar='PATH',
+        help='Path to the test imgs (default: /Ship01/Dataset/water_v1/).')
     parser.add_argument(
-        '-o', '--out-path', default='output/', type=str, metavar='PATH',
-        help='Path to the output segmentations (default: none).')
+        '-o', '--out-path', default='data/raw', type=str, metavar='PATH',
+        help='Path to the output segmentations (default: data/raw/).')
+    parser.add_argument(
+        '--name', default='houston', type=str,
+        help='Test video name (default: houston).')
     args = parser.parse_args()
 
     print('Args:', args)
 
-    if args.checkpoint is None:
-        raise ValueError('Must input checkpoint path.')
-    if args.imgs_path is None:
-        raise ValueError('Must input test images path.')
-    if args.out_path is None:
-        raise ValueError('Must input output images path.')
-
-    water_thres = 5
+    water_thres = 128
 
     device = torch.device('cpu')
     if torch.cuda.is_available():
@@ -59,7 +51,8 @@ def test_FCNResNet():
     )
     dataset = Dataset(
         mode='test',
-        dataset_path=args.imgs_path,
+        root=args.imgs_path,
+        video_name=args.name,
         input_transforms=transforms.Compose([
             transforms.ToTensor(),
             imagenet_normalize
@@ -73,14 +66,14 @@ def test_FCNResNet():
     )
 
     # Model
-    fcn_resnet = FCNResNet().to(device)
+    waternetv0 = WaterNetV0().to(device)
 
     # Load pretrained model
     if os.path.isfile(args.checkpoint):
         print('Load checkpoint \'{}\''.format(args.checkpoint))
         checkpoint = torch.load(args.checkpoint)
         args.start_epoch = checkpoint['epoch'] + 1
-        fcn_resnet.load_state_dict(checkpoint['model'])
+        waternetv0.load_state_dict(checkpoint['model'])
         print('Loaded checkpoint \'{}\' (epoch {})'
                 .format(args.checkpoint, checkpoint['epoch']))
     else:
@@ -88,19 +81,17 @@ def test_FCNResNet():
 
     # Start testing
 
-    fcn_resnet.eval()
+    waternetv0.eval()
 
     if not os.path.exists(args.out_path):
-        os.mkdir(args.out_path)
+        os.makedirs(args.out_path)
 
-    for i, input in enumerate(test_loader):
-
-        print(i)
+    for i, input in enumerate(tqdm(test_loader)):
 
         input = input.to(device)
-        output = fcn_resnet(input)
+        output = waternetv0(input)
 
-        seg = output.cpu().detach().numpy().squeeze(0).transpose((1, 2, 0))
+        seg = output.cpu().detach().numpy().squeeze(0).transpose((1, 2, 0)) * 255
         ret, seg = cv2.threshold(seg, water_thres, 255, cv2.THRESH_BINARY)
 
         seg_path = os.path.join(args.out_path, str(i) + '.png')
@@ -108,4 +99,4 @@ def test_FCNResNet():
 
 
 if __name__ == '__main__':
-    test_FCNResNet()
+    test_WaterNetV0()

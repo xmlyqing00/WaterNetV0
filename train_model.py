@@ -1,14 +1,13 @@
+#!/usr/bin/env python3
 import os
 import argparse
-import sys
-import time
 import torch
+from tqdm import tqdm
 from torch.utils import model_zoo
 from torchvision import transforms
 
-sys.path.append('../')
-from model import FCNResNet
-from utils.dataset import Dataset
+from FCN.model import WaterNetV0
+from FCN.dataset import Dataset
 from utils.AvgMeter import AverageMeter
 
 
@@ -19,10 +18,9 @@ def adjust_learning_rate(optimizer, start_lr, epoch):
         param_group['lr'] = lr
 
 
-def train_FCNResNet():
-    
+def train_WaterNetV0():
     # Hyper parameters
-    parser = argparse.ArgumentParser(description='PyTorch FCNResNet Training')
+    parser = argparse.ArgumentParser(description='WaterNetV0 Training')
     parser.add_argument(
         '--start-epoch', default=0, type=int, metavar='N',
         help='Manual epoch number (useful on restarts, default 0).')
@@ -39,7 +37,7 @@ def train_FCNResNet():
         '--dataset', default='/Ship01/Dataset/water_v1', metavar='PATH',
         help='Path to the training dataset')
     parser.add_argument(
-        '--modelpath', default='./models/', metavar='PATH',
+        '--modelpath', default='cp/', metavar='PATH',
         help='Path to the models.')
 
     args = parser.parse_args()
@@ -64,7 +62,7 @@ def train_FCNResNet():
     )
     dataset = Dataset(
         mode='train',
-        dataset_path=args.dataset, 
+        root=args.dataset,
         input_transforms=transforms.Compose([
             transforms.ToTensor(),
             imagenet_normalize
@@ -81,25 +79,27 @@ def train_FCNResNet():
     )
 
     # Model
-    fcn_resnet = FCNResNet().to(device)
+    waternetv0 = WaterNetV0().to(device)
 
     # Criterion and Optimizor
     criterion = torch.nn.BCEWithLogitsLoss().to(device)
 
     optimizer = torch.optim.SGD(
-        params=fcn_resnet.parameters(),
+        params=waternetv0.parameters(),
         lr=args.lr,
         momentum=0.9,
         dampening=1e-4
     )
+
+    start_epoch = args.start_epoch
 
     # Load pretrained model
     if args.resume:
         if os.path.isfile(args.resume):
             print('Load checkpoint \'{}\''.format(args.resume))
             checkpoint = torch.load(args.resume)
-            args.start_epoch = checkpoint['epoch'] + 1
-            fcn_resnet.load_state_dict(checkpoint['model'])
+            start_epoch = checkpoint['epoch'] + 1
+            waternetv0.load_state_dict(checkpoint['model'], strict=False)
             optimizer.load_state_dict(checkpoint['optimizer'])
             print('Loaded checkpoint \'{}\' (epoch {})'
                   .format(args.resume, checkpoint['epoch']))
@@ -109,29 +109,23 @@ def train_FCNResNet():
         print('Load pretrained ResNet 34.')
         resnet34_url = 'https://download.pytorch.org/models/resnet34-333f7ec4.pth'
         pretrained_model = model_zoo.load_url(resnet34_url)
-        fcn_resnet.load_pretrained_model(pretrained_model)
+        waternetv0.load_pretrained_model(pretrained_model)
 
     # Start training
-    fcn_resnet.train()
-    epoch_endtime = time.time()
+    waternetv0.train()
     if not os.path.exists(args.modelpath):
         os.mkdir(args.modelpath)
 
-    epoch_time = AverageMeter()
+    for epoch in range(start_epoch, args.total_epochs):
 
-    for epoch in range(args.start_epoch, args.total_epochs):
-        
         losses = AverageMeter()
-        batch_time = AverageMeter()
-        batch_endtime = time.time()
+        adjust_learning_rate(optimizer, args.lr, epoch)
 
-        adjust_learning_rate(optimizer, args.lr, epoch)   
-
-        for i, (input, target) in enumerate(train_loader):
-            
+        pbar = tqdm(train_loader, desc=f'Epoch {epoch}')
+        for i, (input, target) in enumerate(pbar):
             input, target = input.to(device), target.to(device)
 
-            output = fcn_resnet(input)
+            output = waternetv0(input)
 
             loss = criterion(output, target)
             optimizer.zero_grad()
@@ -140,38 +134,21 @@ def train_FCNResNet():
 
             losses.update(loss.item())
 
-            if i % 100 == 0:
+            pbar.set_postfix(loss=f'{losses.avg:.6f}')
 
-                batch_time.update(time.time() - batch_endtime)
-                batch_endtime = time.time()
-
-                print('Epoch: [{0}/{1} | {2}/{3}]\t'
-                      'Time {batch_time.val:.3f} ({batch_time.sum:.3f})\t'
-                      'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
-                      epoch, args.total_epochs, i, len(train_loader),
-                      batch_time=batch_time, loss=losses))
-
-        epoch_time.update(time.time() - epoch_endtime)
-        epoch_endtime = time.time()
-
-        torch.save(
-            obj={
-                'epoch': epoch,
-                'model': fcn_resnet.state_dict(),
-                'optimizer': optimizer.state_dict(),
-                'loss': losses.avg,
-            },
-            f=os.path.join(args.modelpath, 'checkpoint_{0}.pth.tar'.format(epoch))
-        )
-
-        print('Epoch: [{0}/{1}]\t'
-              'Time {epoch_time.val:.3f} ({epoch_time.sum:.3f})\t'
-              'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
-              epoch, args.total_epochs, 
-              epoch_time=epoch_time, loss=losses))
-        
-        print('Model saved.')
+        if (epoch + 1) % 20 == 0:
+            model_path = os.path.join(args.modelpath, 'checkpoint_{0}.pth.tar'.format(epoch))
+            torch.save(
+                obj={
+                    'epoch': epoch,
+                    'model': waternetv0.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                    'loss': losses.avg,
+                },
+                f=model_path
+            )
+            print(f'Model saved in {model_path}.')
 
 
 if __name__ == '__main__':
-    train_FCNResNet()
+    train_WaterNetV0()

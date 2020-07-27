@@ -2,7 +2,15 @@ __pycache__/
 /.vscode/
 /.idea/
 saved_models/
-FCN/output/
-models/
+cp/
+
+data/raw/
+data/time_smoothed/
+data/overlay_raw/
+data/overlay_time_smoothed/
+data/water_level.csv
+data/*.png
+
+
 
 .DS_Store

@@ -1,8 +1,8 @@
-# WaterLevelEstimation
+# WaterNetV0
 
-This is a package for water level estimation, named **LSUWaterLevelEstimation**. It contains two folders `FCN` and `utils`. For using these scripts, open a Terminal and type the filename to run.
+This is a package for water level estimation, named **WaterNetV0**. For using these scripts, open a Terminal and type the filename to run.
 
-## Environment
+## 1 Environment
 All python scripts are written and tested under Ubuntu 18.04 and Python 3.6
 
 The required libraries and scripts could be simply installed by
@@ -11,64 +11,61 @@ pip install -r requirements.txt
 ```
 Details of the version of the required libraries could be found in the file `requirements.txt`
 
-## Dataset and Pretrained Model
+## 2 Dataset and Pretrained Model
 
-The dataset is split into training data (`water_v1.zip`), and evaluation dataset (`test_videos.zip`). We also provide the pretrained model (`checkpoint_58.pth.tar`).
-Click [here](https://www.dropbox.com/sh/yk39hpqwnzauv02/AAA_IYacZf_bEbcURj-PQXIra?dl=0) to download the dataset and the pretrained model.
+The dataset uploaded to Kaggle as `water_v1`. Click [here](https://www.kaggle.com/gvclsu/water-segmentation-dataset?select=water_v1) to download the dataset.
+We also provide the pretrained model `checkpoint_99.pth.tar`. Click [here]() to download.
 
-You should put the pretrained model at the path `LSUWaterSegmentation/data/models/checkpoint_58.pth.tar`.
 
-You should put the contents of `test_videoes.zip` at `LSUWaterSegmentation/data/models/houston_small`.
+## 3 Usage
 
-## Usage
+### 3.1 Evaluation
 
-### Evaluate the model
-
-To evaluate the model, open a Terminal and type
+Segment water area from the test video frames. The results will be saved into `data/` by default. 
 ```bash
-cd FCN
-python3 test_model.py
+python3 test_model.py -c /path/to/checkpoint.pth.tar -i /path/to/water_v1/
 ```
-Type `--help` to ses the parameters that can be used.
+More options: `-o`, Path to the output segmentations (default: data/raw/). `--name`, Test video name (default: houston).
 
-### Retrain the model
-To retrain the model, open a Terminal and type
+Apply temporal constraint and prior constraint, then estimate the water level. The results will be saved into the `data/` folder by default.
 ```bash
-cd FCN
+python3 estimate_waterlevel.py
+```
+More options: `--out-dir`, Path to the output dir (default: data/). `--anchor-x`, Referece point X. `--anchor-y`, Referece point Y.　`--ori-h`, Original height.
+    
+
+### 3.2 Visualization
+Add the estimated water masks to the original frames.
+```bash
+python3 plot_overlay
+```
+More options: `--img-dir`, Path to the input image folder. `--seg-dir`, Path to the segmentation folder. `--out-dir`, Path to the output overlay folder.
+
+Compare the estiamted water level with the groundtruth, and compare the results w/ or w/o prior constraint.
+```bash
+python3 plot_waterlevel.py
+```
+Note that we attach the groundtruth data of the houston flood in `data/buffalo_gt.csv`.  For the all above scripts, you can type `--help` to ses the parameters that can be used.
+
+### 3.3 Retrain the model
+Retrain the model,
+```bash
 python3 train_model.py
 ```
-Type `--help` to ses the parameters that can be used.
-
-## Documentation
-
-### Scripts in FCN
-This folder contains the scripts of network architecture, training and evaluation.
-
-- `cmp_estimations.py`: Compare and show the results of two water levels.
-- `drop_error_estimation.py`: Compute the water level and drop errors.
-- `estimate_waterlevel.py`: Estimate the water level from the water segmentations of the frames.
-- `model.py`: Network architecture.
-- `post_processing`: Temporal and domain knowledge constraints.
-- `test_model.py`: Scripts for evaluation.
-- `train_model.py`: Scripts for training the model.
-
-### Scripts in Utils
-
-This folder contains scripts for preparing dataset, preprocessing and postprocessing.
-
-- `add_prefix.py`: Add prefix to the path
-- `AvgMeter.py`: Log the model performance when training the model.
-- `cvt_images_to_overlays.py`: Add the segmentation masks on the original frames.
-- `cvt_images_to_video,py`: Compose the frames to a video.
-- `cvt_labelme_to_collection.py`: User annotations are created by LabelMe. This script help format the results of LabelMe.
-- `cvt_object_label.py`: Change the color representations of the annotations.
-- `dataset.py`: Class for dataset I/O.
-- `format_file_names.py`: Scripts for formatting the filenames.
-- `laplacian_smooth.py`: Script for laplacian smooth.
-
+optional arguments:
+```bash
+  -h, --help            show this help message and exit
+  --start-epoch N       Manual epoch number (useful on restarts, default 0).
+  --total-epochs N      Number of total epochs to run (default 100).
+  --lr LR, --learning-rate LR
+                        Initial learning rate.
+  --resume PATH         Path to latest checkpoint (default: none).
+  --dataset PATH        Path to the training dataset
+  --modelpath PATH      Path to the models.
+```
 
 ## References:
 
-[1] Russell B C, Torralba A, Murphy K P, et al. LabelMe: a database and web-based tool for image annotation[J]. International journal of computer vision, 2008, 77(1-3): 157-173.
+> [1] Russell B C, Torralba A, Murphy K P, et al. LabelMe: a database and web-based tool for image annotation[J]. International journal of computer vision, 2008, 77(1-3): 157-173.
 
-[2] Long J, Shelhamer E, Darrell T. Fully convolutional networks for semantic segmentation[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2015: 3431-3440.
+> [2] Long J, Shelhamer E, Darrell T. Fully convolutional networks for semantic segmentation[C]//Proceedings of the IEEE conference on computer vision and pattern recognition. 2015: 3431-3440.

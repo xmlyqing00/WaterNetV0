@@ -4,7 +4,7 @@ from torch.autograd import Variable
 from torchvision.models.resnet import BasicBlock
 
 
-class FCNResNet(nn.Module):
+class WaterNetV0(nn.Module):
 
     def __init__(self):
         
@@ -13,7 +13,7 @@ class FCNResNet(nn.Module):
         layers = [3, 4, 6, 3]
 
         self.inplanes = 64
-        super(FCNResNet, self).__init__()
+        super(WaterNetV0, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
@@ -26,6 +26,9 @@ class FCNResNet(nn.Module):
         self.deconv1 = self._make_deconv_layer(512, 256)
         self.deconv2 = self._make_deconv_layer(256, 128)
         self.deconv3 = self._make_deconv_layer(128, 64)
+
+        self.refine1 = nn.Conv2d(64, 64, 3, padding=1)
+        self.refine2 = nn.Conv2d(64, 64, 3, padding=1)
         self.deconv4 = self._make_deconv_layer(64, 1, stride=4)
 
         for m in self.modules():
@@ -112,7 +115,10 @@ class FCNResNet(nn.Module):
         # print(x.shape)
         x = x + pool0
 
+        x = self.relu(self.refine1(x))
+        x = self.relu(self.refine2(x))
         x = self.deconv4(x)
+        # x = torch.softmax(x, dim=1)[:, 1].unsqueeze(1)
         x = self._align_shape(x, input_shape)
         # print(x.shape)
 
@@ -123,13 +129,13 @@ class FCNResNet(nn.Module):
         for name, param in pretrained_model.items():
             if name in own_state:
                 own_state[name].copy_(param.data)
-                own_state[name].requires_grad = False
+                # own_state[name].requires_grad = False
 
 
 if __name__ == '__main__':
 
-    fcn_resnet = FCNResNet()
+    waternetv0 = WaterNetV0()
 
     input = Variable(torch.randn(1, 3, 200, 200))
-    output = fcn_resnet(input)
+    output = waternetv0(input)
     print(output.shape)

@@ -3,5 +3,6 @@ torchvision
 opencv-python~=3.4
 matplotlib
 numpy
+tqdm
 pandas
 Pillow>=5.3.0

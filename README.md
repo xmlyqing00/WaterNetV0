@@ -14,7 +14,7 @@ Details of the version of the required libraries could be found in the file `req
 ## 2 Dataset and Pretrained Model
 
 The dataset uploaded to Kaggle as `water_v1`. Click [here](https://www.kaggle.com/gvclsu/water-segmentation-dataset?select=water_v1) to download the dataset.
-We also provide the pretrained model `checkpoint_99.pth.tar`. Click [here]() to download.
+We also provide the pretrained model `checkpoint_99.pth.tar`. Click [here](https://drive.google.com/file/d/10SQRUH9a4NQO1NRWLol5iI_2ZbeqgPd-/view?usp=sharing) to download.
 
 
 ## 3 Usage

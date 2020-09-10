@@ -3,6 +3,7 @@ __pycache__/
 /.idea/
 saved_models/
 cp/
+.~lock.*
 
 data/raw/
 data/time_smoothed/

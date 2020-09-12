@@ -54,32 +54,55 @@ def estimate_waterlevel(result_dir, csv_path, ref_obj, stride=1, label_color=(25
     waterlevel_df = pd.DataFrame(index=np.arange(len(result_list)), columns=['pier_height'])
 
     n = len(result_list)
+    ref_n = 4
+    pier_height_origin = list()
+    pier_height_origin_sum = 0
 
     for result_idx in trange(0, n, stride):
 
         result_path = os.path.join(result_dir, result_list[result_idx])
         result_img = cv2.imread(result_path)
+        h, w = result_img.shape[:2]
+        step = w / 10
 
-        pier_height = ref_obj['ori_height']
+        pier_height_avg = 0
+        for i in range(0, ref_n):
 
-        for y in range(ref_obj['anchor_pt'][1], ref_obj['anchor_pt'][1] + ref_obj['ori_height'] + 10):
+            pier_height = ref_obj['ori_height']
+            anchor_x = int(ref_obj['anchor_pt'][0] + step * i)
 
-            pier_count = 0
-            for x in range(ref_obj['anchor_pt'][0] - 2, ref_obj['anchor_pt'][0] + 3):
-                img_pt = result_img[y][x]
-                if img_pt[0] == label_color[0] and img_pt[1] == label_color[1] and img_pt[2] == label_color[2]:
-                    pier_count += 1
+            for y in range(ref_obj['anchor_pt'][1], ref_obj['anchor_pt'][1] + ref_obj['ori_height'] + 50):
 
-            if pier_count > 3:
-                pier_height = y - ref_obj['anchor_pt'][1]
-                break
+                pier_count = 0
+                for x in range(anchor_x - 2, anchor_x + 3):
+                    img_pt = result_img[y][x]
+                    if img_pt[0] == label_color[0] and img_pt[1] == label_color[1] and img_pt[2] == label_color[2]:
+                        pier_count += 1
 
-        # print(pier_height)
-        waterlevel_df.loc[result_idx, 'pier_height'] = pier_height
+                if pier_count > 3:
+                    pier_height = y - ref_obj['anchor_pt'][1]
+                    break
+            pier_height_avg += pier_height
+            if result_idx == 0:
+                pier_height_origin.append(pier_height)
+                pier_height_origin_sum += pier_height
+
+
+        pier_height_avg = (pier_height_avg - pier_height_origin_sum) / ref_n + pier_height_origin[0]
+
+        print(result_idx, pier_height)
+
+        waterlevel_df.loc[result_idx, 'pier_height'] = pier_height_avg
 
     waterlevel_df['merged_ratio'] = 1 - waterlevel_df['pier_height'] / ref_obj['ori_height']
 
     waterlevel_df.to_csv(csv_path, index=False)
+
+    plt.figure()
+    waterlevel_df['pier_height'].plot()
+    plt.figure()
+    waterlevel_df['merged_ratio'].plot()
+    plt.show()
 
 
 def constraint_prior(csv_path, key):
@@ -91,6 +114,7 @@ def constraint_prior(csv_path, key):
     laplacian_kernel = [1 / 4, 1 / 3, 1 / 2, 1, -25 / 6, 1, 1 / 2, 1 / 3, 1 / 4]
     width = len(laplacian_kernel)
     half_width = int(width / 2)
+    affect_width = int(width * 0.75)
     n = len(df)
 
     smooth_flag = True
@@ -109,8 +133,8 @@ def constraint_prior(csv_path, key):
             for i in range(0, width):
                 laplacian_val += laplacian_kernel[i] * df.loc[idx + i - half_width, key + '_smoothed']
 
-            if abs(laplacian_val) > 0.1:
-                for i in range(idx - half_width, idx + half_width):
+            if abs(laplacian_val) > 0.08:
+                for i in range(idx - affect_width, idx + affect_width):
                     median_val = df.loc[i - width:i + width + 1, key + '_smoothed'].median()
                     df.loc[i, 'tmp'] = median_val
                 smooth_flag = True
@@ -120,6 +144,17 @@ def constraint_prior(csv_path, key):
 
             pbar.set_postfix(remain=cnt)
 
+    phy_thres = 0.13
+    width = 40
+    for i in range(width, n - width):
+
+        mean = df.loc[i - width: i, 'tmp'].mean()
+        diff = abs(df.loc[i, 'tmp'] - mean)
+        if diff > phy_thres / 2:
+            est_data = df.loc[i - width: i + width / 4, 'tmp'].mean()
+            df.loc[i, 'tmp'] = est_data
+
+    df[key + '_smoothed'] = df['tmp']
     df = df.drop(columns=['tmp'])
     df.to_csv(csv_path, index=False)
 
@@ -165,9 +200,9 @@ if __name__ == '__main__':
         'ori_height': args.ori_h
     }
 
-    constraint_temporal(result_folder, output_folder, stride)
+    # constraint_temporal(result_folder, output_folder, stride)
 
     csv_path = os.path.join(args.out_dir, 'water_level.csv')
-    estimate_waterlevel(output_folder, csv_path, ref_obj, stride)
+    # estimate_waterlevel(output_folder, csv_path, ref_obj, stride)
     constraint_prior(csv_path, 'merged_ratio')
     cvt_px2ft(csv_path, 'Elevation (ft)')
